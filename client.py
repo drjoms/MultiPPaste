@@ -38,5 +38,3 @@ s.send(user_input.encode('UTF-8'))
 s.close()
 print (msg.decode('UTF-8'))
 
-
-
