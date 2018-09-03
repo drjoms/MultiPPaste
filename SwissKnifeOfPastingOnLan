@@ -1,0 +1,77 @@
+#!/usr/bin/python3           # This is client.py file
+
+import socket
+import sys
+
+#first_parameter = sys.argv[1]
+#if first_parameter:
+#    print("nope?")
+
+
+def help(str):
+    print('\n parameters:\n s -  to send, followed by space and IP address \n m - to recieve')
+    print (str)
+
+if len(sys.argv)<2:
+        help('too short?')
+        exit()
+
+if sys.argv[1] is 's':
+
+
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        # get local machine name
+        #host = input('Ip address of machine where to conenct?')
+        host = sys.argv[2]
+        print('this is host: ', host, '\n')
+        port = 9999
+    # connection to hostname on the port.
+        s.connect((host, port))
+
+    # Receive no more than 1024 bytes
+        msg = s.recv(1024)
+        user_input = input ('what do yo want to insert?\n ')
+        s.send(user_input.encode('UTF-8'))
+        s.close()
+        print (msg.decode('UTF-8'))
+
+
+
+
+
+if sys.argv[1] is 'r':
+    import socket
+    import subprocess
+    subprocess.run(["clear"])
+    # create a socket object
+    serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    # get local machine name
+    #host = socket._LOCALHOST
+    host = '0.0.0.0'
+
+    port = 9999
+
+    # bind to the port
+    serversocket.bind((host, port))
+
+    # queue up to 5 requests
+    serversocket.listen(5)
+
+    while True:
+    # establish a connection
+        clientsocket, addr = serversocket.accept()
+
+    # print("Got a connection from %s" % str(addr))
+    #print ("asic chat?")
+        msg = 'Thank you for connecting' + "\r\n"
+        clientsocket.send(msg.encode('UTF-8'))
+        incmes = clientsocket.recv(1024)
+        print(incmes.decode('utf-8'))
+        clientsocket.close()
+
+
+
+else:
+    help('not short but not other choices')
