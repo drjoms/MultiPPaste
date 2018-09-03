@@ -1,5 +1,14 @@
 #!/usr/bin/python3           # This is client.py file
 
+
+#note to self:
+#implement -c flag, so pipe from app to copy paste client could be used
+#multiline
+#GUI/kivi
+#SSL
+#file sending
+
+
 import socket
 import sys
 
@@ -9,11 +18,11 @@ import sys
 
 
 def help(str):
-    print('\n parameters:\n s -  to send, followed by space and IP address \n m - to recieve')
+    print('\n parameters:\n s -  to send, followed by space and IP address \n r - to recieve')
     print (str)
 
 if len(sys.argv)<2:
-        help('too short?')
+        help('\ndid you forget to include some positional variable?')
         exit()
 
 if sys.argv[1] is 's':
@@ -74,4 +83,4 @@ if sys.argv[1] is 'r':
 
 
 else:
-    help('not short but not other choices')
+    help('choices don\'t seem to match?')
