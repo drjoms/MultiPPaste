@@ -1,4 +1,18 @@
 #!/usr/bin/python3           # This is client.py file
+'''
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+'''
 
 
 #note to self:
@@ -6,118 +20,177 @@
 #SSL
 #file sending
 #warning about unsafe use(no ssl yet, no file barriers against over writing)
-
-import socket
-import sys
-import subprocess
+#send several files
+#import subprocess
 #first_parameter = sys.argv[1]
 #if first_parameter:
 #    print("nope?")
+#need to fix help message that is potentially not needed
+#add interractive mode(where no parameters are used and user can choose options# )
+#when recieve message to clear ip address info
+#to add ip address info on doze PC
+#reveiving mode, auto realise what kind of sending mode client is in(message from client must contain this info)
+#perhaps add video download from video site on computer and autocopy to reciving device
+#filesend function needs fix
+#security identities as alternative to SSL(chain of trust)
+#IPv6 support
+#config file
+#platform auto detection
 
-print('choice is ', sys.argv[1])
-def clear_me():
+import socket
+import sys
+#import subprocess
+import os
+
+type_of_app='console' #must change based on type of platform used0
+port=9999 #network port on which listener will listen and to which sender will connect to
+
+positional_parameter = sys.argv[1:]
+
+try: mode = positional_parameter[0]
+except:
+    mode = 'no parameters'
+    print(mode)
+
+def app_output(*args):
+    if type_of_app == 'console':
+        print (*args)
+
+def app_input(*args):
+    usr_input
+    if type_of_app == 'console':
+        usr_input = input(*args)
+
+    return usr_input
+
+
+def help_msg():
+    app_output('\nTo Listen "l"\
+        \nTo send line "sl"\
+        \nTo send multiline "sm"\
+        \nTo send file "sf"\
+        \nBy default app stars in Listen mode\
+        \nIn Linux console to kill it - Ctrl + C')
+
+def clear_screen():
+    try:
+        os.system('clear')
+    except:
+        print('')
 
     try:
-        subprocess.run("clear")
+        os.system('clr')
     except:
         print('')
 
 
-    try:
-        subprocess.run("cls")
-    except:
-        print('')
-
-
-def help(str):
-    print('\n parameters:\n s -  to send, followed by space and IP address \n r - to recieve')
-    print (str)
-
-if len(sys.argv)<2:
-        help('\ndid you forget to include some positional variable?')
-        exit()
-
-if sys.argv[1] is 's':
-
-
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-        # get local machine name
-        #host = input('Ip address of machine where to conenct?')
-        host = sys.argv[2]
-        print('this is host: ', host, '\n')
-        port = 9999
-    # connection to hostname on the port.
-        s.connect((host, port))
-
-    # Receive no more than 1024 bytes
-        msg = s.recv(1024)
-        user_input = input ('what do yo want to insert?\n ')
-        s.send(user_input.encode('UTF-8'))
-        s.close()
-        print (msg.decode('UTF-8'))
-
-if sys.argv[1] is 'm':
-    print('megaline?')
-
-    def multiline():
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-        # get local machine name
-        #host = input('Ip address of machine where to conenct?')
-        host = sys.argv[2]
-        print('this is host: ', host, '\n')
-        port = 9999
-    # connection to hostname on the port.
-        s.connect((host, port))
-
-    # Receive no more than 1024 bytes
-        msg = s.recv(1024)
-        user_input = input ('what do yo want to insert?\n ')
-        s.send(user_input.encode('UTF-8'))
-        s.close()
-        print (msg.decode('UTF-8'))
-        multiline()
-
-
-    multiline()
-
-
-def listen_connection():
-    clear_me()
-    subprocess.run("ip addr|grep inet|grep -v inet6", shell=True)
-    # create a socket object
-    serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    # get local machine name
-    #host = socket._LOCALHOST
+def listen():
+    os.system('ip -4 addr|grep inet')
+#    subprocess.run("ip addr|grep inet|grep -v inet6", shell=True) #commented because does not work in qpython(android)
     host = '0.0.0.0'
-
-    port = 9999
-
-    # bind to the port
+    serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     serversocket.bind((host, port))
+    serversocket.listen(1)  # queue up to 1 requests
+    mode='invalid mode'
+    #default mode
 
-    # queue up to 5 requests
-    serversocket.listen(5)
-
-    while True:
-    # establish a connection
+    while mode != 'valid':
         clientsocket, addr = serversocket.accept()
+        print("Got a connection from %s" % str(addr))
+        print('\n')
+#        mode = clientsocket.recv(1024)
+#        mode = mode.decode('UTF-8')
+#        print (mode.decode('UTF-8'), '\n', 'wtf?\n')
+    #  clientsocket.send(srvmsg.encode('UTF-8'))
 
-    # print("Got a connection from %s" % str(addr))
-    #print ("asic chat?")
-        msg = 'Thank you for connecting' + "\r\n"
-        clientsocket.send(msg.encode('UTF-8'))
-#        clear_me()
-
-        incmes = clientsocket.recv(1024)
-        print(incmes.decode('utf-8'))
+        incmdata = clientsocket.recv(1024)
+        mode = incmdata.decode('UTF-8')
+        print(mode, '-this is mode \n')
+        #app_output(incmdata.decode('UTF-8'))
         clientsocket.close()
 
+        if mode == 'sl':
+            print('\ndebug:triggered sl mode \n')
+            clientsocket, addr = serversocket.accept()
+            incmdata = clientsocket.recv(10240)
+            app_output(incmdata.decode('UTF-8'))
+            mode = 'valid'
+            clientsocket.close()
 
-if sys.argv[1] is 'r':
-    listen_connection()
+        if mode == 'sp':
+            print('\ndebug:  triggered sp mode \n')
+            clientsocket, addr = serversocket.accept()
+            incmdata = clientsocket.recv(10241024)
+            app_output(incmdata.decode('UTF-8'))
+            mode = 'valid'
+            clientsocket.close()
 
-else:
-    help('choices don\'t seem to match?')
+'''
+will need to look into it once i finish working with pipe
+        if mode == 'sm':
+            print('\n if trigerred \n')
+            clientsocket, addr = serversocket.accept()
+            incmdata = clientsocket.recv(1024)
+            app_output(incmdata.decode('UTF-8'))
+            mode = 'multiline'
+            clientsocket.close()
+
+'''
+
+def send():
+    print('supposedly sending')
+    try:
+        destination = positional_parameter[1]
+#trying to accept address from console if it exists
+#note to myself, when data send over 'sock.send' more than ones - on server side it appears as same stream
+    except:
+        print ('destination filled?\n')
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((destination, port))
+    sock.send(mode.encode('UTF-8'))
+    sock.close()
+    if mode == 'sl':
+        clear_screen()
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((destination, port))
+        data_to_be_send = ' '.join(positional_parameter[2:])
+        sock.send(data_to_be_send.encode('UTF-8'))
+        print(data_to_be_send, '- this is what is send\n')
+        sock.close
+
+    if mode == 'sp':
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((destination, port))
+        user_input=(sys.stdin.read())
+        print ('debug', user_input)
+        sock.send(user_input.encode('UTF-8'))
+
+
+
+
+def chat():
+    print('chat to be implemented, not ready yet')
+
+def gui():
+    if type_of_app == 'console':
+        help_msg()
+
+
+if mode == 'l':
+    listen()
+if mode == 'sl':
+    send()
+if mode == 'sm':
+    send()
+if mode == 'sp':
+    send()
+if mode == 'sf':
+    send()
+if mode == 'c':
+    chat()
+if mode == 'g':
+    gui()
+if mode == 'no parameters':
+    help_msg()
+    listen()
