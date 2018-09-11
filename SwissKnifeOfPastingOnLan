@@ -36,7 +36,7 @@
 #IPv6 support
 #config file
 #platform auto detection
-
+#increase size of file being send
 import socket
 import sys
 #import subprocess
@@ -91,6 +91,7 @@ def listen():
     serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     serversocket.bind((host, port))
     serversocket.listen(1)  # queue up to 1 requests
+#    print(serversocket.getsockname())
     mode='invalid mode'
     #default mode
 
@@ -104,6 +105,7 @@ def listen():
     #  clientsocket.send(srvmsg.encode('UTF-8'))
 
         incmdata = clientsocket.recv(1024)
+        #incmdata = clientsocket.recv()
         mode = incmdata.decode('UTF-8')
         print(mode, '-this is mode \n')
         #app_output(incmdata.decode('UTF-8'))
@@ -117,13 +119,30 @@ def listen():
             mode = 'valid'
             clientsocket.close()
 
+
         if mode == 'sp':
             print('\ndebug:  triggered sp mode \n')
             clientsocket, addr = serversocket.accept()
-            incmdata = clientsocket.recv(10241024)
-            app_output(incmdata.decode('UTF-8'))
+            incmdata = clientsocket.recv(1024*8)
+            app_output(incmdata.decode())
             mode = 'valid'
             clientsocket.close()
+
+#to send file is next
+        if mode == 'sf':
+            print('\ndebug:  triggered sf mode \n')
+            clientsocket, addr = serversocket.accept()
+            incmdata = '1'
+            while len(incmdata) !=0:
+                incmdata = clientsocket.recv(1024 * 8)
+                print(incmdata)
+                somefile=open('testfile', 'ab')
+                somefile.write(incmdata)
+            app_output(incmdata)
+
+
+            clientsocket.close()
+            mode = 'valid'
 
 '''
 will need to look into it once i finish working with pipe
@@ -163,9 +182,21 @@ def send():
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((destination, port))
         user_input=(sys.stdin.read())
-        print ('debug', user_input)
-        sock.send(user_input.encode('UTF-8'))
-
+#        print ('debug', user_input)
+        sock.send(user_input.encode())
+#to send file is next
+    if mode == 'sf':
+        path=str(*positional_parameter[2:])
+        print (path, '-this will be send\n')
+        with open(path, 'rb') as file_to_be_send:
+            contents = file_to_be_send.read()
+            print (contents)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.connect((destination, port))
+#        user_input=(sys.stdin.read())
+            print ('debug', file_to_be_send.read())
+            sock.send(contents)
+        file_to_be_send.close()
 
 
 
