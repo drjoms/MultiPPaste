@@ -107,7 +107,7 @@ def listen():
         incmdata = clientsocket.recv(1024)
         #incmdata = clientsocket.recv()
         mode = incmdata.decode('UTF-8')
-        print(mode, '-this is mode \n')
+#        print(mode, '-this is mode \n')
         #app_output(incmdata.decode('UTF-8'))
         clientsocket.close()
 
@@ -130,15 +130,15 @@ def listen():
 
 #to send file is next
         if mode == 'sf':
-            print('\ndebug:  triggered sf mode \n')
+#            print('\ndebug:  triggered sf mode \n')
             clientsocket, addr = serversocket.accept()
             incmdata = '1'
             while len(incmdata) !=0:
                 incmdata = clientsocket.recv(1024 * 8)
-                print(incmdata)
+#                print(incmdata)
                 somefile=open('testfile', 'ab')
                 somefile.write(incmdata)
-            app_output(incmdata)
+            app_output('file supposedly recieved')
 
 
             clientsocket.close()
@@ -187,16 +187,18 @@ def send():
 #to send file is next
     if mode == 'sf':
         path=str(*positional_parameter[2:])
-        print (path, '-this will be send\n')
+#        print (path, '-this will be send\n')
         with open(path, 'rb') as file_to_be_send:
             contents = file_to_be_send.read()
-            print (contents)
+#            print (contents)
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((destination, port))
 #        user_input=(sys.stdin.read())
-            print ('debug', file_to_be_send.read())
-            sock.send(contents)
+#            print ('debug', file_to_be_send.read())
+        sock.send(contents)
+
         file_to_be_send.close()
+    app_output('file supposedly send\n')
 
 
 
