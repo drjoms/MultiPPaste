@@ -130,17 +130,31 @@ def listen():
 
 #to send file is next
         if mode == 'sf':
-#            print('\ndebug:  triggered sf mode \n')
+
+            print('\ndebug:triggered sf mode, name of file below \n')
+            clientsocket, addr = serversocket.accept()
+            filename = clientsocket.recv(10240)
+            filename = filename.decode('UTF-8')
+            app_output(filename)
+            mode = 'valid'
+            clientsocket.close()
+
             clientsocket, addr = serversocket.accept()
             incmdata = '1'
+
+            try:
+                somefile = open(filename, 'x')
+                somefile.close()
+            except:
+                print('already exists?')
+
             while len(incmdata) !=0:
                 incmdata = clientsocket.recv(1024 * 8)
-#                print(incmdata)
-                somefile=open('testfile', 'ab')
+                print('this is filename: ', filename)
+                somefile=open(filename, 'ab')
                 somefile.write(incmdata)
+                somefile.close()
             app_output('file supposedly recieved')
-
-
             clientsocket.close()
             mode = 'valid'
 
@@ -186,8 +200,20 @@ def send():
         sock.send(user_input.encode())
 #to send file is next
     if mode == 'sf':
+
+        clear_screen()
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((destination, port))
+        filename = ' '.join(positional_parameter[2:])
+        filename = os.path.basename(filename)
+        sock.send(filename.encode('UTF-8'))
+
+        print(filename, '- name of file\n')
+        sock.close
+
+
         path=str(*positional_parameter[2:])
-#        print (path, '-this will be send\n')
+        #        print (path, '-this will be send\n')
         with open(path, 'rb') as file_to_be_send:
             contents = file_to_be_send.read()
 #            print (contents)
