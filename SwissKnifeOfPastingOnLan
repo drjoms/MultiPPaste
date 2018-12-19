@@ -65,11 +65,11 @@ def app_input(*args):
 
 
 def help_msg():
-    app_output('\nTo Listen "l"\
-        \nTo send line "sl"\
-        \nTo send multiline "sm"\
-        \nTo send file "sf"\
+    app_output('\nTo Listen "l" or do noting and app will listen by default.In this mode program will receive file or line or multiline and not send anything.\
         \nBy default app stars in Listen mode\
+        \nTo send line "sl" (exmp: sl 192.168.1.45  WHAT I WANT TO SEND AS TEXT)\
+        \nTo send multiline "sm" (same as above, but you can have unlimited ammount of lines there. Command is stuck in loop untill you shut it down, because there is no waty to know how many lines you need to send.)\
+        \nTo send file "sf" (exmp: sf 127.0.0.1  Valid_filename.txt )\
         \nIn Linux console to kill it - Ctrl + C')
 
 def clear_screen():
@@ -99,10 +99,7 @@ def listen():
         clientsocket, addr = serversocket.accept()
         print("Got a connection from %s" % str(addr))
         print('\n')
-#        mode = clientsocket.recv(1024)
-#        mode = mode.decode('UTF-8')
-#        print (mode.decode('UTF-8'), '\n', 'wtf?\n')
-    #  clientsocket.send(srvmsg.encode('UTF-8'))
+
 
         incmdata = clientsocket.recv(1024)
         #incmdata = clientsocket.recv()
@@ -112,7 +109,6 @@ def listen():
         clientsocket.close()
 
         if mode == 'sl':
-            print('\ndebug:triggered sl mode \n')
             clientsocket, addr = serversocket.accept()
             incmdata = clientsocket.recv(10240)
             app_output(incmdata.decode('UTF-8'))
@@ -121,7 +117,6 @@ def listen():
 
 
         if mode == 'sp':
-            print('\ndebug:  triggered sp mode \n')
             clientsocket, addr = serversocket.accept()
             incmdata = clientsocket.recv(1024*8)
             app_output(incmdata.decode())
@@ -131,7 +126,6 @@ def listen():
 #to send file is next
         if mode == 'sf':
 
-            print('\ndebug:triggered sf mode, name of file below \n')
             clientsocket, addr = serversocket.accept()
             filename = clientsocket.recv(10240)
             filename = filename.decode('UTF-8')
